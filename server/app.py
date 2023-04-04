@@ -28,9 +28,10 @@ from flask import Flask, request, make_response, jsonify
 from flask_migrate import Migrate
 
 # 1. ✅ Import `Api` and `Resource` from `flask_restful`
+from flask_restful import Api,Resource
     # ❓ What do these two classes do at a higher level? 
 
-from models import db, Production, CrewMember
+from models import db, Production as ProductionModel, CrewMember
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
@@ -42,14 +43,35 @@ migrate = Migrate(app, db)
 db.init_app(app)
 
 # 2. ✅ Initialize the Api
-    # `api = Api(app)`
+api = Api(app)
 
 # 3. ✅ Create a Production class that inherits from Resource
-
+class Production(Resource):
 # 4. ✅ Create a GET (All) Route
     # 4.1 Make a `get` method that takes `self` as a param.
+    def get(self):
     # 4.2 Create a `productions` array.
+        productions=[]
     # 4.3 Make a query for all productions. For each `production`, create a dictionary 
+        all=ProductionModel.query.all()
+        for production in all:
+            production_dict={
+                "id":production.id,
+                "title":production.title,
+                "genre":production.genre,
+                "budget":production.budget,
+                "image":production.image,
+                "director":production.director,
+                "description":production.description,
+                "ongoing":production.ongoing,
+                "created_at":production.created_at,
+                "updated_at":production.updated_at
+            }
+            productions.append(production_dict)
+        return make_response(productions,200)
+    
+
+api.add_resource(Production,"/productions")
     # containing all attributes before appending to the `productions` array.
     # 4.4 Create a `response` variable and set it to: 
     #  #make_response(
